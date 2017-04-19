@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+    nginx:
+        image: tutum/nginx
+        ports:
+            - "80:80"
+        links:
+            - phpfpm    
+        volumes:
+            - ./nginx/default:/etc/nginx/sites-available/default
+            - ./nginx/default:/etc/nginx/sites-enabled/default
+            - ./logs/nginx-error.log:/var/log/nginx/error.log
+            - ./logs/nginx-access.log:/var/log/nginx/access.log
+    
+    phpfpm:
+        image: rmdeo/phpfpm:mysql
+        build: ./images/phpfpm
+        ports:
+            - "9000:9000"
+        volumes:
+            - ./src:/var/www/html
+        depends_on:
+            - "mysql"
+            
+    mysql:
+        image: mariadb
+        environment:
+            MYSQL_ROOT_PASSWORD: admin
+            MYSQL_DATABASE: curatordb
